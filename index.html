@@ -3,437 +3,205 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Learning Journal + Vocab SRS</title>
+  <title>Learning Journal</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f17">
+  <link rel="apple-touch-icon" href="./icon-192.png">
   <style>
-    :root{
-      --bg:#0b0f17; --card:#121a2a; --muted:#93a4c7; --text:#e7eeff;
-      --accent:#6ea8fe; --good:#7ee787; --danger:#ff6b6b; --border:#22304a;
-      --shadow: 0 18px 50px rgba(0,0,0,.32);
-      --radius:18px;
-    }
+    :root{--bg:#0b0f17;--card:#121a2a;--muted:#93a4c7;--text:#e7eeff;--accent:#6ea8fe;--good:#7ee787;--danger:#ff6b6b;--border:#22304a;--shadow:0 18px 50px rgba(0,0,0,.32);--radius:18px}
     *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      color:var(--text);
-      background:
-        radial-gradient(1100px 700px at 15% -10%, #1b2b55 0, transparent 60%),
-        radial-gradient(950px 750px at 115% 15%, #1a4a3b 0, transparent 55%),
-        var(--bg);
-      min-height:100vh;
-    }
-    .app{
-      max-width: 520px;
-      margin: 0 auto;
-      padding: 14px 14px 92px; /* space for bottom nav */
-    }
-
-    .topbar{
-      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
-      margin: 6px 0 14px;
-    }
-    .brand h1{margin:0; font-size:18px; letter-spacing:.2px}
-    .brand p{margin:6px 0 0; font-size:12px; color:var(--muted); line-height:1.35}
-
-    .chiprow{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end}
-    .chip{
-      border:1px solid var(--border);
-      background: rgba(255,255,255,.04);
-      padding:8px 10px;
-      border-radius:999px;
-      font-size:12px;
-      color:var(--muted);
-      display:flex; gap:8px; align-items:center;
-      box-shadow: 0 10px 26px rgba(0,0,0,.18);
-    }
+    body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--text);background:radial-gradient(1100px 700px at 15% -10%, #1b2b55 0, transparent 60%),radial-gradient(950px 750px at 115% 15%, #1a4a3b 0, transparent 55%),var(--bg);min-height:100vh}
+    .app{max-width:520px;margin:0 auto;padding:14px 14px 92px}
+    .topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin:6px 0 14px}
+    .brand h1{margin:0;font-size:18px;letter-spacing:.2px}
+    .brand p{margin:6px 0 0;font-size:12px;color:var(--muted);line-height:1.35}
+    .chiprow{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .chip{border:1px solid var(--border);background:rgba(255,255,255,.04);padding:8px 10px;border-radius:999px;font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center;box-shadow:0 10px 26px rgba(0,0,0,.18)}
     .chip b{color:var(--text)}
-    .btn{
-      border:1px solid var(--border);
-      background: rgba(255,255,255,.05);
-      color:var(--text);
-      padding:10px 12px;
-      border-radius:14px;
-      cursor:pointer;
-      font-weight:700;
-      transition:.15s ease;
-      font-size:12px;
-      box-shadow: 0 10px 26px rgba(0,0,0,.18);
-    }
-    .btn:hover{transform: translateY(-1px); border-color: color-mix(in srgb, var(--accent) 45%, var(--border));}
-    .btn.primary{background: color-mix(in srgb, var(--accent) 28%, rgba(255,255,255,.06)); border-color: color-mix(in srgb, var(--accent) 55%, var(--border));}
-    .btn.good{background: color-mix(in srgb, var(--good) 18%, rgba(255,255,255,.06)); border-color: color-mix(in srgb, var(--good) 45%, var(--border));}
-    .btn.danger{background: color-mix(in srgb, var(--danger) 12%, rgba(255,255,255,.06)); border-color: color-mix(in srgb, var(--danger) 40%, var(--border));}
-    .btn.ghost{background: rgba(255,255,255,.03);}
-
-    .card{
-      background: color-mix(in srgb, var(--card) 92%, black);
-      border:1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 14px;
-      box-shadow: var(--shadow);
-      margin-bottom: 12px;
-    }
-    .card h2{margin:0 0 10px; font-size:14px; color:#d7e3ff}
-    .sub{font-size:12px; color:var(--muted); margin-top:6px; line-height:1.35}
-
-    /* Tabs */
-    .screen{display:none}
-    .screen.active{display:block}
-
-    /* Journal days grid */
-    .grid{
-      display:grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap:10px;
-    }
-    @media (max-width: 360px){ .grid{grid-template-columns: repeat(4, 1fr);} }
-    .day{
-      border:1px solid var(--border);
-      background: rgba(255,255,255,.03);
-      border-radius: 16px;
-      padding:10px;
-      min-height: 68px;
-      cursor:pointer;
-      position:relative;
-      transition: .12s ease;
-      user-select:none;
-    }
-    .day:hover{transform: translateY(-1px); border-color: color-mix(in srgb, var(--accent) 40%, var(--border));}
-    .day.active{outline:2px solid color-mix(in srgb, var(--accent) 70%, transparent);}
-    .day.done{border-color: color-mix(in srgb, var(--good) 50%, var(--border));}
-    .day .n{font-weight:900; font-size:12px}
-    .day .meta{margin-top:6px; font-size:11px; color:var(--muted); line-height:1.15}
-    .badge{
-      position:absolute; top:8px; right:8px;
-      font-size:10px; padding:3px 7px;
-      border-radius:999px;
-      border:1px solid var(--border);
-      color: var(--muted);
-      background: rgba(255,255,255,.03);
-    }
-    .badge.done{color:#bff2c7; border-color: color-mix(in srgb, var(--good) 40%, var(--border));}
-
-    /* Form */
-    label{display:block; font-size:12px; color:var(--muted); margin:10px 0 6px}
-    input, textarea, select{
-      width:100%;
-      background: rgba(255,255,255,.03);
-      border:1px solid var(--border);
-      border-radius: 14px;
-      padding: 11px 11px;
-      color:var(--text);
-      outline:none;
-      font-size:13px;
-    }
-    textarea{min-height:140px; resize:vertical}
-    .two{display:grid; grid-template-columns: 1fr 1fr; gap:10px}
-    @media (max-width: 420px){ .two{grid-template-columns: 1fr;} }
-    .sep{height:1px; background: var(--border); margin:12px 0}
-    .row{
-      display:flex; gap:10px; flex-wrap:wrap;
-    }
-
-    /* KPIs */
-    .kpi{display:grid; grid-template-columns: repeat(4,1fr); gap:10px;}
-    @media (max-width: 480px){ .kpi{grid-template-columns: repeat(2,1fr);} }
-    .k{padding:12px; border-radius: 16px; border:1px solid var(--border); background: rgba(255,255,255,.03)}
-    .k .v{font-size:18px; font-weight:950}
-    .k .t{font-size:12px; color:var(--muted); margin-top:4px}
-
-    /* Vocab list */
-    .vocabTop{
-      display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
-    }
-    .search{
-      flex: 1;
-      min-width: 180px;
-    }
-    .list{
-      margin-top: 10px;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-    }
-    .item{
-      border:1px solid var(--border);
-      background: rgba(255,255,255,.03);
-      border-radius: 16px;
-      padding: 12px;
-    }
-    .itemTop{
-      display:flex; justify-content:space-between; align-items:flex-start; gap:10px;
-    }
-    .word{
-      font-size: 15px;
-      font-weight: 950;
-      letter-spacing:.2px;
-    }
-    .tag{
-      font-size:11px;
-      padding:4px 8px;
-      border-radius:999px;
-      border:1px solid var(--border);
-      color: var(--muted);
-      background: rgba(255,255,255,.03);
-      white-space:nowrap;
-    }
-    .meaning{margin-top:6px; color:#d7e3ff; font-size:13px; line-height:1.35}
-    .example{margin-top:6px; color:var(--muted); font-size:12px; line-height:1.35}
-    .itemBtns{margin-top:10px; display:flex; gap:8px; flex-wrap:wrap}
-
-    /* Review */
-    .reviewCard{
-      border:1px solid var(--border);
-      background: rgba(255,255,255,.03);
-      border-radius: 18px;
-      padding: 14px;
-      margin-top: 10px;
-    }
-    .reviewWord{
-      font-size: 20px;
-      font-weight: 1000;
-      letter-spacing:.3px;
-    }
-    .reveal{
-      margin-top:10px;
-      display:none;
-    }
-    .reveal.show{display:block}
-    .hintRow{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
-    .tiny{font-size:11px; color:var(--muted)}
-    .progress{
-      height: 10px;
-      border-radius: 999px;
-      border:1px solid var(--border);
-      background: rgba(255,255,255,.03);
-      overflow:hidden;
-      margin-top: 10px;
-    }
-    .progress > div{
-      height:100%;
-      width:0%;
-      background: color-mix(in srgb, var(--accent) 50%, rgba(255,255,255,.06));
-    }
-
-    /* Bottom nav */
-    .nav{
-      position: fixed;
-      left: 50%;
-      transform: translateX(-50%);
-      bottom: 12px;
-      width: min(520px, calc(100% - 20px));
-      background: rgba(10,14,23,.88);
-      border: 1px solid var(--border);
-      border-radius: 22px;
-      padding: 10px;
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(8px);
-      display:flex;
-      gap: 10px;
-      justify-content:space-between;
-    }
-    .nav button{
-      flex:1;
-      border:1px solid transparent;
-      background: rgba(255,255,255,.02);
-      color: var(--muted);
-      padding: 11px 10px;
-      border-radius: 16px;
-      font-weight: 900;
-      cursor:pointer;
-      font-size: 12px;
-      transition: .12s ease;
-    }
-    .nav button.active{
-      color: var(--text);
-      border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
-      background: color-mix(in srgb, var(--accent) 18%, rgba(255,255,255,.02));
-    }
-
-    .toast{
-      position: fixed;
-      left: 50%;
-      bottom: 92px;
-      transform: translateX(-50%);
-      background: rgba(10,14,23,.92);
-      border: 1px solid var(--border);
-      padding: 10px 12px;
-      border-radius: 14px;
-      font-size: 12px;
-      color: var(--text);
-      box-shadow: var(--shadow);
-      opacity: 0;
-      pointer-events:none;
-      transition: .18s ease;
-      max-width: min(520px, calc(100% - 20px));
-      text-align:center;
-    }
-    .toast.show{opacity:1; transform: translateX(-50%) translateY(-2px);}
-
-    .footer{
-      font-size: 11px;
-      color: var(--muted);
-      line-height: 1.35;
-      margin-top: 10px;
-    }
+    .btn{border:1px solid var(--border);background:rgba(255,255,255,.05);color:var(--text);padding:10px 12px;border-radius:14px;cursor:pointer;font-weight:700;transition:.15s ease;font-size:12px;box-shadow:0 10px 26px rgba(0,0,0,.18)}
+    .btn.primary{background:color-mix(in srgb, var(--accent) 28%, rgba(255,255,255,.06));border-color:color-mix(in srgb, var(--accent) 55%, var(--border))}
+    .btn.good{background:color-mix(in srgb, var(--good) 18%, rgba(255,255,255,.06));border-color:color-mix(in srgb, var(--good) 45%, var(--border))}
+    .btn.danger{background:color-mix(in srgb, var(--danger) 12%, rgba(255,255,255,.06));border-color:color-mix(in srgb, var(--danger) 40%, var(--border))}
+    .btn.ghost{background:rgba(255,255,255,.03)}
+    .card{background:color-mix(in srgb, var(--card) 92%, black);border:1px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);margin-bottom:12px}
+    .card h2{margin:0 0 10px;font-size:14px;color:#d7e3ff}
+    .sub{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.35}
+    .screen{display:none}.screen.active{display:block}
+    .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+    @media (max-width:360px){.grid{grid-template-columns:repeat(4,1fr)}}
+    .day{border:1px solid var(--border);background:rgba(255,255,255,.03);border-radius:16px;padding:10px;min-height:68px;cursor:pointer;position:relative;transition:.12s ease;user-select:none}
+    .day.active{outline:2px solid color-mix(in srgb, var(--accent) 70%, transparent)}
+    .day.done{border-color:color-mix(in srgb, var(--good) 50%, var(--border))}
+    .day .n{font-weight:900;font-size:12px}
+    .day .meta{margin-top:6px;font-size:11px;color:var(--muted);line-height:1.15}
+    .badge{position:absolute;top:8px;right:8px;font-size:10px;padding:3px 7px;border-radius:999px;border:1px solid var(--border);color:var(--muted);background:rgba(255,255,255,.03)}
+    .badge.done{color:#bff2c7;border-color:color-mix(in srgb, var(--good) 40%, var(--border))}
+    label{display:block;font-size:12px;color:var(--muted);margin:10px 0 6px}
+    input,textarea,select{width:100%;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:11px;color:var(--text);outline:none;font-size:13px}
+    textarea{min-height:140px;resize:vertical}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media (max-width:420px){.two{grid-template-columns:1fr}}
+    .sep{height:1px;background:var(--border);margin:12px 0}
+    .row{display:flex;gap:10px;flex-wrap:wrap}
+    .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    @media (max-width:480px){.kpi{grid-template-columns:repeat(2,1fr)}}
+    .k{padding:12px;border-radius:16px;border:1px solid var(--border);background:rgba(255,255,255,.03)}
+    .k .v{font-size:18px;font-weight:950}.k .t{font-size:12px;color:var(--muted);margin-top:4px}
+    .vocabTop{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .search{flex:1;min-width:180px}
+    .list{margin-top:10px;display:flex;flex-direction:column;gap:10px}
+    .item{border:1px solid var(--border);background:rgba(255,255,255,.03);border-radius:16px;padding:12px}
+    .itemTop{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+    .word{font-size:15px;font-weight:950;letter-spacing:.2px}
+    .tag{font-size:11px;padding:4px 8px;border-radius:999px;border:1px solid var(--border);color:var(--muted);background:rgba(255,255,255,.03);white-space:nowrap}
+    .meaning{margin-top:6px;color:#d7e3ff;font-size:13px;line-height:1.35}
+    .example{margin-top:6px;color:var(--muted);font-size:12px;line-height:1.35}
+    .itemBtns{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+    .reviewCard{border:1px solid var(--border);background:rgba(255,255,255,.03);border-radius:18px;padding:14px;margin-top:10px}
+    .reviewWord{font-size:20px;font-weight:1000;letter-spacing:.3px}
+    .reveal{margin-top:10px;display:none}.reveal.show{display:block}
+    .hintRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .tiny{font-size:11px;color:var(--muted)}
+    .progress{height:10px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,.03);overflow:hidden;margin-top:10px}
+    .progress>div{height:100%;width:0%;background:color-mix(in srgb, var(--accent) 50%, rgba(255,255,255,.06))}
+    .nav{position:fixed;left:50%;transform:translateX(-50%);bottom:12px;width:min(520px,calc(100% - 20px));background:rgba(10,14,23,.88);border:1px solid var(--border);border-radius:22px;padding:10px;box-shadow:var(--shadow);backdrop-filter:blur(8px);display:flex;gap:10px;justify-content:space-between}
+    .nav button{flex:1;border:1px solid transparent;background:rgba(255,255,255,.02);color:var(--muted);padding:11px 10px;border-radius:16px;font-weight:900;cursor:pointer;font-size:12px;transition:.12s ease}
+    .nav button.active{color:var(--text);border-color:color-mix(in srgb, var(--accent) 55%, var(--border));background:color-mix(in srgb, var(--accent) 18%, rgba(255,255,255,.02))}
+    .toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);background:rgba(10,14,23,.92);border:1px solid var(--border);padding:10px 12px;border-radius:14px;font-size:12px;color:var(--text);box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:.18s ease;max-width:min(520px,calc(100% - 20px));text-align:center}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(-2px)}
+    .footer{font-size:11px;color:var(--muted);line-height:1.35;margin-top:10px}
+    .toggle{border:1px solid var(--border);background:rgba(255,255,255,.04);border-radius:999px;padding:6px 8px;display:flex;gap:6px;align-items:center}
+    .toggle select{width:auto;padding:6px 8px;border-radius:999px}
   </style>
 </head>
 <body>
   <div class="app">
     <div class="topbar">
       <div class="brand">
-        <h1>📚 Learning Journal</h1>
-        <p>Mobile-style journal + vocabulary spaced repetition (offline).</p>
+        <h1 id="t_brand">📚 Learning Journal</h1>
+        <p id="t_brand_sub">Mobile journal + vocabulary spaced repetition (offline).</p>
       </div>
       <div class="chiprow">
-        <div class="chip">Plan: <b id="planDays">30</b>d</div>
-        <div class="chip">Review due: <b id="dueCountTop">0</b></div>
+        <div class="toggle">
+          <span class="tiny" id="t_lang">Language</span>
+          <select id="langSel"><option value="en">English</option><option value="km">ខ្មែរ</option></select>
+        </div>
+        <div class="chip"><span id="t_plan">Plan</span>: <b id="planDays">30</b>d</div>
+        <div class="chip"><span id="t_due">Review due</span>: <b id="dueCountTop">0</b></div>
       </div>
     </div>
 
-    <!-- Screen: Journal -->
     <section class="screen active" id="screenJournal">
       <div class="card">
-        <h2>📅 Days</h2>
+        <h2 id="t_days_title">📅 Days</h2>
         <div class="row" style="justify-content:space-between">
-          <div class="chip">Selected: <b id="selDay">Day 1</b></div>
+          <div class="chip"><span id="t_selected">Selected</span>: <b id="selDay">Day 1</b></div>
           <div class="row">
-            <button class="btn" id="addDaysBtn">+7 days</button>
+            <button class="btn" id="addDaysBtn">+7</button>
             <button class="btn good" id="exportBtn">Export</button>
             <button class="btn" id="importBtn">Import</button>
             <button class="btn danger" id="resetBtn">Reset</button>
           </div>
         </div>
         <div style="margin-top:12px" class="grid" id="daysGrid"></div>
-
         <div style="margin-top:12px" class="kpi">
-          <div class="k"><div class="v" id="doneCount">0</div><div class="t">Done days</div></div>
-          <div class="k"><div class="v" id="streak">0</div><div class="t">Streak</div></div>
-          <div class="k"><div class="v" id="bestStreak">0</div><div class="t">Best</div></div>
-          <div class="k"><div class="v" id="words">0</div><div class="t">Words written</div></div>
+          <div class="k"><div class="v" id="doneCount">0</div><div class="t" id="t_done_days">Done days</div></div>
+          <div class="k"><div class="v" id="streak">0</div><div class="t" id="t_streak">Streak</div></div>
+          <div class="k"><div class="v" id="bestStreak">0</div><div class="t" id="t_best">Best</div></div>
+          <div class="k"><div class="v" id="words">0</div><div class="t" id="t_words">Words written</div></div>
         </div>
-
-        <div class="footer">Tip: “Done” can be just 10 minutes. Consistency wins.</div>
+        <div class="footer" id="t_tip_done">Tip: “Done” can be just 10 minutes. Consistency wins.</div>
       </div>
 
       <div class="card">
-        <h2>✍️ Daily Entry</h2>
-
+        <h2 id="t_entry_title">✍️ Daily Entry</h2>
         <div class="two">
+          <div><label id="t_date" for="date">Date</label><input id="date" type="date"/></div>
           <div>
-            <label for="date">Date</label>
-            <input id="date" type="date" />
-          </div>
-          <div>
-            <label for="focus">Focus</label>
+            <label id="t_focus" for="focus">Focus</label>
             <select id="focus">
-              <option value="All">All (speaking + listening + reading + writing)</option>
-              <option value="Speaking">Speaking</option>
-              <option value="Listening">Listening</option>
-              <option value="Reading">Reading</option>
-              <option value="Writing">Writing</option>
-              <option value="Vocabulary">Vocabulary</option>
-              <option value="Grammar">Grammar</option>
-              <option value="Pronunciation">Pronunciation</option>
-              <option value="Other">Other</option>
+              <option value="All">All</option><option value="Speaking">Speaking</option><option value="Listening">Listening</option>
+              <option value="Reading">Reading</option><option value="Writing">Writing</option><option value="Vocabulary">Vocabulary</option>
+              <option value="Grammar">Grammar</option><option value="Pronunciation">Pronunciation</option><option value="Other">Other</option>
             </select>
           </div>
         </div>
-
         <div class="two">
+          <div><label id="t_minutes" for="minutes">Minutes practiced</label><input id="minutes" type="number" min="0" placeholder="e.g., 20"/></div>
           <div>
-            <label for="minutes">Minutes practiced</label>
-            <input id="minutes" type="number" min="0" placeholder="e.g., 20" />
-          </div>
-          <div>
-            <label for="mood">Mood</label>
+            <label id="t_mood" for="mood">Mood</label>
             <select id="mood">
-              <option value="🙂 Good">🙂 Good</option>
-              <option value="😐 Okay">😐 Okay</option>
-              <option value="😕 Low">😕 Low</option>
-              <option value="🔥 Motivated">🔥 Motivated</option>
-              <option value="😴 Tired">😴 Tired</option>
+              <option value="🙂 Good">🙂 Good</option><option value="😐 Okay">😐 Okay</option><option value="😕 Low">😕 Low</option>
+              <option value="🔥 Motivated">🔥 Motivated</option><option value="😴 Tired">😴 Tired</option>
             </select>
           </div>
         </div>
-
-        <label for="wins">Win(s) today</label>
-        <input id="wins" placeholder="e.g., Shadowed 2-min video, learned 5 words" />
-
-        <label for="notes">Notes</label>
-        <textarea id="notes" placeholder="Write your notes here..."></textarea>
-
-        <label for="next">Tomorrow plan (tiny)</label>
-        <input id="next" placeholder="e.g., 10 min listening + 5 min speaking" />
-
+        <label id="t_wins" for="wins">Win(s) today</label><input id="wins" placeholder="e.g., Shadowed 2-min video, learned 5 words"/>
+        <label id="t_notes" for="notes">Notes</label><textarea id="notes" placeholder="Write your notes here..."></textarea>
+        <label id="t_next" for="next">Tomorrow plan (tiny)</label><input id="next" placeholder="e.g., 10 min listening + 5 min speaking"/>
         <div class="sep"></div>
         <div class="row">
           <button class="btn primary" id="saveBtn">Save</button>
-          <button class="btn good" id="markDoneBtn">Mark Done ✅</button>
+          <button class="btn good" id="markDoneBtn">Done ✅</button>
           <button class="btn ghost" id="unmarkBtn">Unmark</button>
         </div>
       </div>
     </section>
 
-    <!-- Screen: Vocab -->
     <section class="screen" id="screenVocab">
       <div class="card">
-        <h2>🧠 Vocabulary</h2>
+        <h2 id="t_vocab_title">🧠 Vocabulary</h2>
         <div class="vocabTop">
-          <input class="search" id="vocabSearch" placeholder="Search word / meaning..." />
+          <input class="search" id="vocabSearch" placeholder="Search word / meaning..."/>
           <button class="btn primary" id="openAddVocab">+ Add</button>
         </div>
-        <div class="sub">All saved on this device. Use Export in Journal tab for backup.</div>
+        <div class="sub" id="t_vocab_sub">Saved on this device. Use Export in Journal tab for backup.</div>
       </div>
 
       <div class="card" id="addVocabCard" style="display:none">
-        <h2>➕ Add Word</h2>
-        <label for="vwWord">Word / Phrase</label>
-        <input id="vwWord" placeholder="e.g., consistent" />
-        <label for="vwMeaning">Meaning (your language)</label>
-        <input id="vwMeaning" placeholder="e.g., steady, not changing" />
-        <label for="vwExample">Example sentence</label>
-        <input id="vwExample" placeholder="e.g., I study English consistently." />
+        <h2 id="t_add_word">➕ Add Word</h2>
+        <label id="t_word" for="vwWord">Word / Phrase</label><input id="vwWord" placeholder="e.g., consistent"/>
+        <label id="t_meaning" for="vwMeaning">Meaning</label><input id="vwMeaning" placeholder="e.g., steady, not changing"/>
+        <label id="t_example" for="vwExample">Example sentence</label><input id="vwExample" placeholder="e.g., I study English consistently."/>
         <div class="row" style="margin-top:10px">
           <button class="btn good" id="saveVocabBtn">Save Word</button>
           <button class="btn ghost" id="cancelVocabBtn">Cancel</button>
         </div>
-        <div class="footer">SRS starts in Box 1 (review soon).</div>
+        <div class="footer" id="t_srs_note">SRS starts in Box 1 (review soon).</div>
       </div>
 
       <div class="card">
-        <h2>📦 SRS Boxes</h2>
+        <h2 id="t_srs_boxes">📦 SRS Boxes</h2>
         <div class="kpi">
-          <div class="k"><div class="v" id="box1">0</div><div class="t">Box 1 (daily)</div></div>
-          <div class="k"><div class="v" id="box2">0</div><div class="t">Box 2 (2 days)</div></div>
-          <div class="k"><div class="v" id="box3">0</div><div class="t" id="box3Label">Box 3 (4 days)</div></div>
-          <div class="k"><div class="v" id="box4">0</div><div class="t" id="box4Label">Box 4 (7 days)</div></div>
+          <div class="k"><div class="v" id="box1">0</div><div class="t" id="t_box1">Box 1 (daily)</div></div>
+          <div class="k"><div class="v" id="box2">0</div><div class="t" id="t_box2">Box 2 (2 days)</div></div>
+          <div class="k"><div class="v" id="box3">0</div><div class="t" id="t_box3">Box 3 (4 days)</div></div>
+          <div class="k"><div class="v" id="box4">0</div><div class="t" id="t_box4">Box 4 (7 days)</div></div>
         </div>
         <div class="kpi" style="margin-top:10px">
-          <div class="k"><div class="v" id="box5">0</div><div class="t" id="box5Label">Box 5 (14 days)</div></div>
-          <div class="k"><div class="v" id="dueCount">0</div><div class="t">Due now</div></div>
-          <div class="k"><div class="v" id="totalVocab">0</div><div class="t">Total words</div></div>
-          <div class="k"><div class="v" id="learnedVocab">0</div><div class="t">In Box 5</div></div>
+          <div class="k"><div class="v" id="box5">0</div><div class="t" id="t_box5">Box 5 (14 days)</div></div>
+          <div class="k"><div class="v" id="dueCount">0</div><div class="t" id="t_due_now">Due now</div></div>
+          <div class="k"><div class="v" id="totalVocab">0</div><div class="t" id="t_total_words">Total words</div></div>
+          <div class="k"><div class="v" id="learnedVocab">0</div><div class="t" id="t_in_box5">In Box 5</div></div>
         </div>
       </div>
 
       <div class="card">
-        <h2>📃 Your List</h2>
+        <h2 id="t_list_title">📃 Your List</h2>
         <div class="list" id="vocabList"></div>
-        <div class="footer">Tip: keep words *useful* (daily + engineering words).</div>
+        <div class="footer" id="t_vocab_tip">Tip: keep words useful (daily + engineering words).</div>
       </div>
     </section>
 
-    <!-- Screen: Review -->
     <section class="screen" id="screenReview">
       <div class="card">
-        <h2>⏱ Review Session</h2>
+        <h2 id="t_review_title">⏱ Review Session</h2>
         <div class="row" style="justify-content:space-between">
-          <div class="chip">Due now: <b id="dueNow">0</b></div>
+          <div class="chip"><span id="t_due_now2">Due now</span>: <b id="dueNow">0</b></div>
           <button class="btn primary" id="startReviewBtn">Start Review</button>
         </div>
-        <div class="sub">Leitner SRS: ✅ moves up a box, ❌ drops to Box 1. Due dates update automatically.</div>
-        <div class="progress" aria-label="session progress"><div id="progBar"></div></div>
+        <div class="sub" id="t_review_sub">✅ moves up a box, ❌ drops to Box 1.</div>
+        <div class="progress"><div id="progBar"></div></div>
 
         <div class="reviewCard" id="reviewCard" style="display:none">
           <div class="tiny" id="reviewMeta">Card 1 / 10</div>
@@ -457,7 +225,7 @@
           </div>
         </div>
 
-        <div class="footer" id="reviewFooter">Hit “Start Review” to practice the words that are due.</div>
+        <div class="footer" id="reviewFooter">Tap “Start Review” to practice due words.</div>
       </div>
     </section>
 
@@ -466,835 +234,72 @@
   </div>
 
   <div class="nav">
-    <button id="navJournal" class="active">📘 Journal</button>
-    <button id="navVocab">🧠 Vocab</button>
-    <button id="navReview">⏱ Review</button>
+    <button id="navJournal" class="active">📘 <span id="t_nav_journal">Journal</span></button>
+    <button id="navVocab">🧠 <span id="t_nav_vocab">Vocab</span></button>
+    <button id="navReview">⏱ <span id="t_nav_review">Review</span></button>
   </div>
 
 <script>
-/* =============================
-   STORAGE & STATE
-============================= */
-const KEY = "learning_app_v2";
-
-const SRS_INTERVALS_DAYS = [1, 2, 4, 7, 14]; // Box 1..5 (simple Leitner-ish)
-
-function todayISO(){
-  const d = new Date();
-  const tz = d.getTimezoneOffset() * 60000;
-  return new Date(d - tz).toISOString().slice(0,10);
-}
-function addDaysISO(iso, days){
-  const d = new Date(iso + "T00:00:00");
-  d.setDate(d.getDate() + days);
-  const tz = d.getTimezoneOffset() * 60000;
-  return new Date(d - tz).toISOString().slice(0,10);
-}
-function toast(msg){
-  const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.classList.add("show");
-  setTimeout(()=>t.classList.remove("show"), 1100);
-}
-function uid(){
-  return Math.random().toString(16).slice(2) + "-" + Date.now().toString(16);
-}
-
-function loadState(){
-  const raw = localStorage.getItem(KEY);
-  if(raw){
-    try { return JSON.parse(raw); } catch(e) {}
-  }
-  return {
-    planDays: 30,
-    selectedDay: 1,
-    entries: {},      // day -> journal entry
-    vocab: []         // array of cards
-  };
-}
-function saveState(){
-  localStorage.setItem(KEY, JSON.stringify(state));
-}
-
-let state = loadState();
-
-/* =============================
-   UI REFS
-============================= */
-// Nav/screens
-const screenJournal = document.getElementById("screenJournal");
-const screenVocab = document.getElementById("screenVocab");
-const screenReview = document.getElementById("screenReview");
-const navJournal = document.getElementById("navJournal");
-const navVocab = document.getElementById("navVocab");
-const navReview = document.getElementById("navReview");
-
-// Top chips
-const planDaysEl = document.getElementById("planDays");
-const dueCountTopEl = document.getElementById("dueCountTop");
-
-// Journal grid/editor/stats
-const daysGrid = document.getElementById("daysGrid");
-const selDayEl = document.getElementById("selDay");
-const dateEl = document.getElementById("date");
-const focusEl = document.getElementById("focus");
-const minutesEl = document.getElementById("minutes");
-const moodEl = document.getElementById("mood");
-const winsEl = document.getElementById("wins");
-const notesEl = document.getElementById("notes");
-const nextEl = document.getElementById("next");
-const doneCountEl = document.getElementById("doneCount");
-const streakEl = document.getElementById("streak");
-const bestStreakEl = document.getElementById("bestStreak");
-const wordsEl = document.getElementById("words");
-
-// Vocab
-const vocabSearchEl = document.getElementById("vocabSearch");
-const vocabListEl = document.getElementById("vocabList");
-const addVocabCard = document.getElementById("addVocabCard");
-const openAddVocab = document.getElementById("openAddVocab");
-const vwWord = document.getElementById("vwWord");
-const vwMeaning = document.getElementById("vwMeaning");
-const vwExample = document.getElementById("vwExample");
-const saveVocabBtn = document.getElementById("saveVocabBtn");
-const cancelVocabBtn = document.getElementById("cancelVocabBtn");
-
-// Box stats
-const box1El = document.getElementById("box1");
-const box2El = document.getElementById("box2");
-const box3El = document.getElementById("box3");
-const box4El = document.getElementById("box4");
-const box5El = document.getElementById("box5");
-const dueCountEl = document.getElementById("dueCount");
-const totalVocabEl = document.getElementById("totalVocab");
-const learnedVocabEl = document.getElementById("learnedVocab");
-
-// Review
-const dueNowEl = document.getElementById("dueNow");
-const startReviewBtn = document.getElementById("startReviewBtn");
-const reviewCardEl = document.getElementById("reviewCard");
-const reviewMetaEl = document.getElementById("reviewMeta");
-const reviewWordEl = document.getElementById("reviewWord");
-const reviewMeaningEl = document.getElementById("reviewMeaning");
-const reviewExampleEl = document.getElementById("reviewExample");
-const revealBtn = document.getElementById("revealBtn");
-const revealArea = document.getElementById("revealArea");
-const knewBtn = document.getElementById("knewBtn");
-const forgotBtn = document.getElementById("forgotBtn");
-const boxInfoEl = document.getElementById("boxInfo");
-const progBar = document.getElementById("progBar");
-const reviewFooter = document.getElementById("reviewFooter");
-const editThisBtn = document.getElementById("editThisBtn");
-const deleteThisBtn = document.getElementById("deleteThisBtn");
-
-// Export/Import/Reset
-const fileInput = document.getElementById("fileInput");
-
-/* =============================
-   JOURNAL HELPERS
-============================= */
-function getEntry(day){ return state.entries[String(day)] || null; }
-function setEntry(day, entry){ state.entries[String(day)] = entry; }
-function countWords(text){
-  const t = (text || "").trim();
-  if(!t) return 0;
-  return t.split(/\s+/).length;
-}
-function totalWords(){
-  let sum = 0;
-  for(const k in state.entries){
-    sum += countWords(state.entries[k].notes || "");
-  }
-  return sum;
-}
-
-function doneDaysSortedByDate(){
-  const items = [];
-  for(let d=1; d<=state.planDays; d++){
-    const e = getEntry(d);
-    if(e && e.done && e.date) items.push({day:d, date:e.date});
-  }
-  items.sort((a,b)=> (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
-  return items;
-}
-
-function computeStreaks(){
-  const done = doneDaysSortedByDate();
-  if(done.length === 0) return {current:0, best:0};
-
-  function diffDays(a,b){
-    const da = new Date(a);
-    const db = new Date(b);
-    const ms = 24*60*60*1000;
-    return Math.round((db - da)/ms);
-  }
-
-  let best = 1, cur = 1;
-  for(let i=1;i<done.length;i++){
-    const gap = diffDays(done[i-1].date, done[i].date);
-    if(gap === 1){
-      cur += 1;
-      best = Math.max(best, cur);
-    } else if(gap > 1){
-      cur = 1;
-    }
-  }
-
-  const latest = done[done.length-1].date;
-  const t = todayISO();
-  const gapToToday = diffDays(latest, t);
-  let current = 0;
-  if(gapToToday === 0 || gapToToday === 1){
-    current = 1;
-    for(let i=done.length-1; i>0; i--){
-      const gap = diffDays(done[i-1].date, done[i].date);
-      if(gap === 1) current++;
-      else break;
-    }
-  } else current = 0;
-
-  return {current, best};
-}
-
-/* =============================
-   SRS HELPERS
-============================= */
-/*
-Card schema:
-{
-  id, word, meaning, example,
-  box: 1..5,
-  createdAt: ISO,
-  lastReviewedAt: ISO|null,
-  dueAt: ISO,
-  stats: { correct: n, wrong: n }
-}
-*/
-function normalizeVocab(){
-  // Ensure dueAt exists / repair older data
-  const t = todayISO();
-  state.vocab = (state.vocab || []).map(c=>{
-    const box = Math.min(5, Math.max(1, Number(c.box || 1)));
-    let dueAt = c.dueAt;
-    if(!dueAt){
-      // if never reviewed, due today; else schedule next based on box
-      dueAt = c.lastReviewedAt ? addDaysISO(c.lastReviewedAt, SRS_INTERVALS_DAYS[box-1]) : t;
-    }
-    return {
-      id: c.id || uid(),
-      word: (c.word || "").trim(),
-      meaning: (c.meaning || "").trim(),
-      example: (c.example || "").trim(),
-      box,
-      createdAt: c.createdAt || t,
-      lastReviewedAt: c.lastReviewedAt || null,
-      dueAt,
-      stats: c.stats || {correct:0, wrong:0}
-    };
-  }).filter(c => c.word.length > 0);
-}
-
-function isDue(card){
-  return (card.dueAt || todayISO()) <= todayISO();
-}
-
-function dueCards(){
-  return state.vocab.filter(isDue).sort((a,b)=> (a.dueAt < b.dueAt ? -1 : 1));
-}
-
-function boxCounts(){
-  const counts = [0,0,0,0,0];
-  for(const c of state.vocab){
-    counts[(c.box||1)-1] += 1;
-  }
-  return counts;
-}
-
-function scheduleNext(card){
-  const interval = SRS_INTERVALS_DAYS[card.box-1];
-  const base = todayISO();
-  card.lastReviewedAt = base;
-  card.dueAt = addDaysISO(base, interval);
-}
-
-function markCorrect(card){
-  card.stats.correct = (card.stats.correct||0) + 1;
-  card.box = Math.min(5, (card.box||1) + 1);
-  scheduleNext(card);
-}
-function markWrong(card){
-  card.stats.wrong = (card.stats.wrong||0) + 1;
-  card.box = 1;
-  scheduleNext(card);
-}
-
-/* =============================
-   RENDER: JOURNAL
-============================= */
-function renderDays(){
-  planDaysEl.textContent = state.planDays;
-  selDayEl.textContent = `Day ${state.selectedDay}`;
-
-  daysGrid.innerHTML = "";
-  for(let d=1; d<=state.planDays; d++){
-    const e = getEntry(d);
-    const div = document.createElement("div");
-    div.className = "day";
-    if(d === state.selectedDay) div.classList.add("active");
-    if(e && e.done) div.classList.add("done");
-
-    const n = document.createElement("div");
-    n.className = "n";
-    n.textContent = `Day ${d}`;
-    div.appendChild(n);
-
-    const meta = document.createElement("div");
-    meta.className = "meta";
-    if(e){
-      const mins = e.minutes ? `${e.minutes}m` : "";
-      const f = e.focus && e.focus !== "All" ? e.focus : "";
-      const date = e.date ? e.date : "";
-      meta.textContent = [date, f, mins].filter(Boolean).join(" • ") || "—";
-    } else meta.textContent = "—";
-    div.appendChild(meta);
-
-    const badge = document.createElement("div");
-    badge.className = "badge" + ((e && e.done) ? " done" : "");
-    badge.textContent = (e && e.done) ? "Done" : "Not yet";
-    div.appendChild(badge);
-
-    div.addEventListener("click", ()=>{
-      state.selectedDay = d;
-      saveState();
-      renderAll();
-    });
-
-    daysGrid.appendChild(div);
-  }
-}
-
-function renderEditor(){
-  const e = getEntry(state.selectedDay);
-  dateEl.value = (e && e.date) ? e.date : todayISO();
-  focusEl.value = (e && e.focus) ? e.focus : "All";
-  minutesEl.value = (e && (e.minutes ?? "") !== null) ? (e.minutes ?? "") : "";
-  moodEl.value = (e && e.mood) ? e.mood : "🙂 Good";
-  winsEl.value = (e && e.wins) ? e.wins : "";
-  notesEl.value = (e && e.notes) ? e.notes : "";
-  nextEl.value = (e && e.next) ? e.next : "";
-}
-
-function renderStats(){
-  let doneCount = 0;
-  for(let d=1; d<=state.planDays; d++){
-    const e = getEntry(d);
-    if(e && e.done) doneCount++;
-  }
-  doneCountEl.textContent = doneCount;
-
-  const {current, best} = computeStreaks();
-  streakEl.textContent = current;
-  bestStreakEl.textContent = best;
-
-  wordsEl.textContent = totalWords();
-}
-
-/* =============================
-   RENDER: VOCAB
-============================= */
-function renderVocabStats(){
-  const counts = boxCounts();
-  box1El.textContent = counts[0];
-  box2El.textContent = counts[1];
-  box3El.textContent = counts[2];
-  box4El.textContent = counts[3];
-  box5El.textContent = counts[4];
-
-  const due = dueCards().length;
-  dueCountEl.textContent = due;
-  dueCountTopEl.textContent = due;
-  dueNowEl.textContent = due;
-
-  totalVocabEl.textContent = state.vocab.length;
-  learnedVocabEl.textContent = counts[4];
-}
-
-function cardTag(card){
-  const due = isDue(card) ? "Due" : ("Due " + card.dueAt);
-  return `Box ${card.box} • ${due}`;
-}
-
-function renderVocabList(){
-  const q = (vocabSearchEl.value || "").trim().toLowerCase();
-  const items = state.vocab
-    .slice()
-    .sort((a,b)=>{
-      // due first, then box low to high, then word
-      const ad = isDue(a) ? 0 : 1;
-      const bd = isDue(b) ? 0 : 1;
-      if(ad !== bd) return ad - bd;
-      if(a.box !== b.box) return a.box - b.box;
-      return a.word.localeCompare(b.word);
-    })
-    .filter(c=>{
-      if(!q) return true;
-      return (c.word + " " + c.meaning + " " + c.example).toLowerCase().includes(q);
-    });
-
-  vocabListEl.innerHTML = "";
-  if(items.length === 0){
-    const empty = document.createElement("div");
-    empty.className = "sub";
-    empty.textContent = "No words yet. Tap + Add to create your first card.";
-    vocabListEl.appendChild(empty);
-    return;
-  }
-
-  for(const c of items){
-    const box = document.createElement("div");
-    box.className = "item";
-
-    const top = document.createElement("div");
-    top.className = "itemTop";
-
-    const left = document.createElement("div");
-    const w = document.createElement("div");
-    w.className = "word";
-    w.textContent = c.word;
-    left.appendChild(w);
-
-    const m = document.createElement("div");
-    m.className = "meaning";
-    m.textContent = c.meaning || "—";
-    left.appendChild(m);
-
-    const ex = document.createElement("div");
-    ex.className = "example";
-    ex.textContent = c.example ? `Example: ${c.example}` : "Example: —";
-    left.appendChild(ex);
-
-    const tag = document.createElement("div");
-    tag.className = "tag";
-    tag.textContent = cardTag(c);
-
-    top.appendChild(left);
-    top.appendChild(tag);
-    box.appendChild(top);
-
-    const btns = document.createElement("div");
-    btns.className = "itemBtns";
-
-    const edit = document.createElement("button");
-    edit.className = "btn";
-    edit.textContent = "Edit";
-    edit.onclick = ()=> openEditVocab(c.id);
-
-    const del = document.createElement("button");
-    del.className = "btn danger";
-    del.textContent = "Delete";
-    del.onclick = ()=> deleteVocab(c.id);
-
-    const review = document.createElement("button");
-    review.className = "btn primary";
-    review.textContent = isDue(c) ? "Review now" : "Practice";
-    review.onclick = ()=>{
-      // Start a one-card session
-      startSession([c.id]);
-      switchScreen("review");
-    };
-
-    btns.appendChild(review);
-    btns.appendChild(edit);
-    btns.appendChild(del);
-    box.appendChild(btns);
-
-    vocabListEl.appendChild(box);
-  }
-}
-
-/* =============================
-   REVIEW SESSION LOGIC
-============================= */
-let session = {
-  ids: [],
-  idx: 0,
-  revealed: false
-};
-
-function startSession(optionalIds=null){
-  const ids = optionalIds
-    ? optionalIds.slice()
-    : dueCards().map(c=>c.id);
-
-  session = { ids, idx: 0, revealed: false };
-
-  if(ids.length === 0){
-    reviewCardEl.style.display = "none";
-    reviewFooter.textContent = "No cards due right now. Add vocab or come back later.";
-    progBar.style.width = "0%";
-    toast("No cards due ✅");
-    return;
-  }
-
-  reviewCardEl.style.display = "block";
-  reviewFooter.textContent = "Reveal → then choose ✅ / ❌.";
-  renderReviewCard();
-}
-
-function getCardById(id){
-  return state.vocab.find(c=>c.id === id) || null;
-}
-
-function renderReviewCard(){
-  const total = session.ids.length;
-  const idx = session.idx;
-  const id = session.ids[idx];
-  const c = getCardById(id);
-
-  if(!c){
-    // skip missing
-    session.ids.splice(idx,1);
-    if(session.ids.length === 0) return startSession([]);
-    session.idx = Math.min(session.idx, session.ids.length-1);
-    return renderReviewCard();
-  }
-
-  session.revealed = false;
-  revealArea.classList.remove("show");
-
-  reviewMetaEl.textContent = `Card ${idx+1} / ${total}`;
-  reviewWordEl.textContent = c.word;
-  reviewMeaningEl.textContent = c.meaning || "—";
-  reviewExampleEl.textContent = c.example ? `Example: ${c.example}` : "Example: —";
-  boxInfoEl.textContent = `Current: Box ${c.box} • Next due will be based on box interval (${SRS_INTERVALS_DAYS[c.box-1]} day(s)).`;
-  progBar.style.width = Math.round((idx/total)*100) + "%";
-}
-
-function nextCard(){
-  session.idx += 1;
-  const total = session.ids.length;
-  if(session.idx >= total){
-    progBar.style.width = "100%";
-    reviewCardEl.style.display = "none";
-    reviewFooter.textContent = "Nice. Session complete ✅";
-    toast("Review complete ✅");
-    saveState();
-    renderAll();
-    return;
-  }
-  renderReviewCard();
-}
-
-/* =============================
-   VOCAB CRUD
-============================= */
-function openAdd(){
-  addVocabCard.style.display = "block";
-  vwWord.value = "";
-  vwMeaning.value = "";
-  vwExample.value = "";
-  vwWord.focus();
-}
-
-function closeAdd(){
-  addVocabCard.style.display = "none";
-}
-
-let editingId = null;
-
-function openEditVocab(id){
-  const c = getCardById(id);
-  if(!c) return;
-  editingId = id;
-  addVocabCard.style.display = "block";
-  vwWord.value = c.word;
-  vwMeaning.value = c.meaning;
-  vwExample.value = c.example;
-  vwWord.focus();
-  toast("Editing…");
-}
-
-function saveVocab(){
-  const word = (vwWord.value || "").trim();
-  const meaning = (vwMeaning.value || "").trim();
-  const example = (vwExample.value || "").trim();
-  if(!word){
-    toast("Word is required");
-    vwWord.focus();
-    return;
-  }
-
-  const t = todayISO();
-
-  if(editingId){
-    const c = getCardById(editingId);
-    if(!c) return;
-    c.word = word;
-    c.meaning = meaning;
-    c.example = example;
-    // keep box/due/stats
-    editingId = null;
-    closeAdd();
-    saveState();
-    toast("Updated ✅");
-    renderAll();
-    return;
-  }
-
-  const newCard = {
-    id: uid(),
-    word, meaning, example,
-    box: 1,
-    createdAt: t,
-    lastReviewedAt: null,
-    dueAt: t, // due today
-    stats: {correct:0, wrong:0}
-  };
-  state.vocab.unshift(newCard);
-  closeAdd();
-  saveState();
-  toast("Added ✅");
-  renderAll();
-}
-
-function deleteVocab(id){
-  const c = getCardById(id);
-  if(!c) return;
-  const ok = confirm(`Delete "${c.word}"?`);
-  if(!ok) return;
-  state.vocab = state.vocab.filter(x=>x.id !== id);
-  saveState();
-  toast("Deleted");
-  renderAll();
-}
-
-/* =============================
-   SCREEN NAV
-============================= */
-function switchScreen(which){
-  const map = {
-    journal: [screenJournal, navJournal],
-    vocab: [screenVocab, navVocab],
-    review: [screenReview, navReview]
-  };
-  for(const k in map){
-    map[k][0].classList.remove("active");
-    map[k][1].classList.remove("active");
-  }
-  map[which][0].classList.add("active");
-  map[which][1].classList.add("active");
-
-  // helpful refresh
-  if(which === "review"){
-    dueNowEl.textContent = dueCards().length;
-  }
-}
-
-/* =============================
-   EVENTS
-============================= */
-// Nav
-navJournal.onclick = ()=> switchScreen("journal");
-navVocab.onclick = ()=> switchScreen("vocab");
-navReview.onclick = ()=> switchScreen("review");
-
-// Journal actions
-document.getElementById("saveBtn").addEventListener("click", ()=>{
-  const entry = {
-    date: dateEl.value || todayISO(),
-    focus: focusEl.value,
-    minutes: minutesEl.value === "" ? null : Number(minutesEl.value),
-    mood: moodEl.value,
-    wins: winsEl.value.trim(),
-    notes: notesEl.value.trim(),
-    next: nextEl.value.trim(),
-    done: (getEntry(state.selectedDay)?.done) || false
-  };
-  setEntry(state.selectedDay, entry);
-  saveState();
-  toast("Saved ✅");
-  renderAll();
-});
-
-document.getElementById("markDoneBtn").addEventListener("click", ()=>{
-  const prev = getEntry(state.selectedDay) || {};
-  const entry = {
-    date: dateEl.value || prev.date || todayISO(),
-    focus: focusEl.value || prev.focus || "All",
-    minutes: minutesEl.value === "" ? (prev.minutes ?? null) : Number(minutesEl.value),
-    mood: moodEl.value || prev.mood || "🙂 Good",
-    wins: winsEl.value.trim() || prev.wins || "",
-    notes: notesEl.value.trim() || prev.notes || "",
-    next: nextEl.value.trim() || prev.next || "",
-    done: true
-  };
-  setEntry(state.selectedDay, entry);
-  saveState();
-  toast("Done ✅");
-  renderAll();
-});
-
-document.getElementById("unmarkBtn").addEventListener("click", ()=>{
-  const e = getEntry(state.selectedDay);
-  if(!e) return toast("Nothing to unmark");
-  e.done = false;
-  setEntry(state.selectedDay, e);
-  saveState();
-  toast("Unmarked");
-  renderAll();
-});
-
-document.getElementById("addDaysBtn").addEventListener("click", ()=>{
-  state.planDays += 7;
-  saveState();
-  toast("+7 days");
-  renderAll();
-});
-
-document.getElementById("resetBtn").addEventListener("click", ()=>{
-  const ok = confirm("Reset EVERYTHING? (Journal + Vocab) This clears this browser’s data.");
-  if(!ok) return;
-  localStorage.removeItem(KEY);
-  state = loadState();
-  normalizeVocab();
-  toast("Reset done");
-  renderAll();
-});
-
-// Export/Import (backup all)
-document.getElementById("exportBtn").addEventListener("click", ()=>{
-  const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "learning-app-backup.json";
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-  toast("Exported");
-});
-
-document.getElementById("importBtn").addEventListener("click", ()=>{
-  fileInput.value = "";
-  fileInput.click();
-});
-
-fileInput.addEventListener("change", async ()=>{
-  const file = fileInput.files?.[0];
-  if(!file) return;
-  try{
-    const txt = await file.text();
-    const imported = JSON.parse(txt);
-    if(!imported || typeof imported !== "object") throw new Error("Bad file");
-    if(typeof imported.planDays !== "number" || typeof imported.entries !== "object") throw new Error("Invalid format");
-    state = imported;
-    normalizeVocab();
-    saveState();
-    toast("Imported ✅");
-    renderAll();
-  }catch(e){
-    alert("Import failed: " + e.message);
-  }
-});
-
-// Ctrl/Cmd+S to save journal
-window.addEventListener("keydown", (e)=>{
-  if((e.ctrlKey || e.metaKey) && e.key.toLowerCase()==="s"){
-    e.preventDefault();
-    document.getElementById("saveBtn").click();
-  }
-});
-
-// Vocab actions
-openAddVocab.onclick = ()=>{
-  editingId = null;
-  openAdd();
-};
-cancelVocabBtn.onclick = ()=>{
-  editingId = null;
-  closeAdd();
-};
-saveVocabBtn.onclick = saveVocab;
-
-vocabSearchEl.addEventListener("input", ()=>{
-  renderVocabList();
-});
-
-// Review actions
-startReviewBtn.onclick = ()=> startSession();
-revealBtn.onclick = ()=>{
-  session.revealed = true;
-  revealArea.classList.add("show");
-};
-knewBtn.onclick = ()=>{
-  const id = session.ids[session.idx];
-  const c = getCardById(id);
-  if(!c) return nextCard();
-  markCorrect(c);
-  saveState();
-  toast(`✅ Up to Box ${c.box}`);
-  renderVocabStats();
-  nextCard();
-};
-forgotBtn.onclick = ()=>{
-  const id = session.ids[session.idx];
-  const c = getCardById(id);
-  if(!c) return nextCard();
-  markWrong(c);
-  saveState();
-  toast("❌ Back to Box 1");
-  renderVocabStats();
-  nextCard();
-};
-
-editThisBtn.onclick = ()=>{
-  const id = session.ids[session.idx];
-  const c = getCardById(id);
-  if(!c) return;
-  switchScreen("vocab");
-  openEditVocab(c.id);
-};
-
-deleteThisBtn.onclick = ()=>{
-  const id = session.ids[session.idx];
-  const c = getCardById(id);
-  if(!c) return;
-  const ok = confirm(`Delete "${c.word}"?`);
-  if(!ok) return;
-  deleteVocab(id);
-  // remove from session
-  session.ids = session.ids.filter(x=>x !== id);
-  session.idx = Math.min(session.idx, session.ids.length-1);
-  if(session.ids.length === 0){
-    startSession([]);
-  } else {
-    renderReviewCard();
-  }
-};
-
-/* =============================
-   MASTER RENDER
-============================= */
-function renderAll(){
-  normalizeVocab();
-  // Journal
-  renderDays();
-  renderEditor();
-  renderStats();
-
-  // Vocab
-  renderVocabStats();
-  renderVocabList();
-
-  // Review header numbers
-  dueNowEl.textContent = dueCards().length;
-  dueCountTopEl.textContent = dueCards().length;
-}
-
-normalizeVocab();
-saveState();
-renderAll();
+/* Bilingual dictionary + full app logic (compressed for ZIP build) */
+const I18N={en:{t_brand:"📚 Learning Journal",t_brand_sub:"Mobile journal + vocabulary spaced repetition (offline).",t_lang:"Language",t_plan:"Plan",t_due:"Review due",t_days_title:"📅 Days",t_selected:"Selected",t_done_days:"Done days",t_streak:"Streak",t_best:"Best",t_words:"Words written",t_tip_done:"Tip: “Done” can be just 10 minutes. Consistency wins.",t_entry_title:"✍️ Daily Entry",t_date:"Date",t_focus:"Focus",t_minutes:"Minutes practiced",t_mood:"Mood",t_wins:"Win(s) today",t_notes:"Notes",t_next:"Tomorrow plan (tiny)",saveBtn:"Save",markDoneBtn:"Done ✅",unmarkBtn:"Unmark",exportBtn:"Export",importBtn:"Import",resetBtn:"Reset",addDaysBtn:"+7",vocabSearch:"Search word / meaning...",openAddVocab:"+ Add",t_vocab_title:"🧠 Vocabulary",t_vocab_sub:"Saved on this device. Use Export in Journal tab for backup.",t_add_word:"➕ Add Word",t_word:"Word / Phrase",t_meaning:"Meaning",t_example:"Example sentence",saveVocabBtn:"Save Word",cancelVocabBtn:"Cancel",t_srs_note:"SRS starts in Box 1 (review soon).",t_srs_boxes:"📦 SRS Boxes",t_box1:"Box 1 (daily)",t_box2:"Box 2 (2 days)",t_box3:"Box 3 (4 days)",t_box4:"Box 4 (7 days)",t_box5:"Box 5 (14 days)",t_due_now:"Due now",t_total_words:"Total words",t_in_box5:"In Box 5",t_list_title:"📃 Your List",t_vocab_tip:"Tip: keep words useful (daily + engineering words).",t_review_title:"⏱ Review Session",startReviewBtn:"Start Review",t_review_sub:"✅ moves up a box, ❌ drops to Box 1.",revealBtn:"Reveal",editThisBtn:"Edit",deleteThisBtn:"Delete",knewBtn:"✅ I knew it",forgotBtn:"❌ I forgot",reviewFooter:"Tap “Start Review” to practice due words.",t_due_now2:"Due now",t_nav_journal:"Journal",t_nav_vocab:"Vocab",t_nav_review:"Review",ph_minutes:"e.g., 20",ph_wins:"e.g., Shadowed 2-min video, learned 5 words",ph_notes:"Write your notes here...",ph_next:"e.g., 10 min listening + 5 min speaking",ph_word:"e.g., consistent",ph_meaning:"e.g., steady, not changing",ph_example:"e.g., I study English consistently.",empty_vocab:"No words yet. Tap + Add to create your first card.",tag_due:"Due",tag_due_on:"Due ",confirm_reset:"Reset EVERYTHING? (Journal + Vocab) This clears this device’s data.",confirm_delete:"Delete",toast_saved:"Saved ✅",toast_done:"Done ✅",toast_unmarked:"Unmarked",toast_added:"Added ✅",toast_updated:"Updated ✅",toast_deleted:"Deleted",toast_exported:"Exported",toast_imported:"Imported ✅",toast_import_fail:"Import failed: ",toast_no_due:"No cards due ✅",toast_review_done:"Review complete ✅",toast_word_required:"Word is required"},km:{t_brand:"📚 កំណត់ត្រាសិក្សា",t_brand_sub:"កំណត់ត្រាប្រចាំថ្ងៃ + ពាក្យថ្មី (SRS) ដោយមិនចាំបាច់អ៊ីនធឺណិត។",t_lang:"ភាសា",t_plan:"ផែនការ",t_due:"ត្រូវរំលឹក",t_days_title:"📅 ថ្ងៃ",t_selected:"ជ្រើសរើស",t_done_days:"ថ្ងៃបានធ្វើ",t_streak:"ជាប់គ្នា",t_best:"ល្អបំផុត",t_words:"ពាក្យសរសេរ",t_tip_done:"គន្លឹះ៖ “Done” គ្រាន់តែ 10 នាទីក៏បាន។ ស្ថិរភាពឈ្នះ។",t_entry_title:"✍️ កំណត់ត្រាប្រចាំថ្ងៃ",t_date:"កាលបរិច្ឆេទ",t_focus:"ផ្នែកផ្តោត",t_minutes:"នាទីហាត់",t_mood:"អារម្មណ៍",t_wins:"អ្វីដែលបានសម្រេចថ្ងៃនេះ",t_notes:"កំណត់ត្រា",t_next:"ផែនការថ្ងៃស្អែក (តូចៗ)",saveBtn:"រក្សាទុក",markDoneBtn:"បានធ្វើ ✅",unmarkBtn:"ដកសញ្ញា",exportBtn:"នាំចេញ",importBtn:"នាំចូល",resetBtn:"កំណត់ឡើងវិញ",addDaysBtn:"+7",vocabSearch:"ស្វែងរក ពាក្យ/ន័យ...",openAddVocab:"+ បន្ថែម",t_vocab_title:"🧠 ពាក្យថ្មី",t_vocab_sub:"រក្សាទុកក្នុងទូរស័ព្ទនេះ។ ប្រើ “នាំចេញ” ដើម្បីបម្រុងទុក។",t_add_word:"➕ បន្ថែមពាក្យ",t_word:"ពាក្យ/ឃ្លា",t_meaning:"ន័យ",t_example:"ឧទាហរណ៍ប្រយោគ",saveVocabBtn:"រក្សាទុកពាក្យ",cancelVocabBtn:"បោះបង់",t_srs_note:"SRS ចាប់ផ្តើមពីប្រអប់ 1 (ត្រូវរំលឹកឆាប់ៗ)។",t_srs_boxes:"📦 ប្រអប់ SRS",t_box1:"ប្រអប់ 1 (រាល់ថ្ងៃ)",t_box2:"ប្រអប់ 2 (២ថ្ងៃ)",t_box3:"ប្រអប់ 3 (៤ថ្ងៃ)",t_box4:"ប្រអប់ 4 (៧ថ្ងៃ)",t_box5:"ប្រអប់ 5 (១៤ថ្ងៃ)",t_due_now:"ត្រូវរំលឹកឥឡូវ",t_total_words:"ពាក្យសរុប",t_in_box5:"នៅប្រអប់ 5",t_list_title:"📃 បញ្ជីរបស់អ្នក",t_vocab_tip:"គន្លឹះ៖ រក្សាពាក្យដែលមានប្រយោជន៍ (ប្រចាំថ្ងៃ + ពាក្យវិស្វកម្ម)។",t_review_title:"⏱ រំលឹកពាក្យ",startReviewBtn:"ចាប់ផ្តើមរំលឹក",t_review_sub:"✅ ត្រូវ → ឡើងប្រអប់, ❌ ភ្លេច → ទៅប្រអប់ 1។",revealBtn:"បង្ហាញ",editThisBtn:"កែ",deleteThisBtn:"លុប",knewBtn:"✅ ចាំបាន",forgotBtn:"❌ ភ្លេច",reviewFooter:"ចុច “ចាប់ផ្តើមរំលឹក” ដើម្បីរំលឹកពាក្យដែលដល់ពេល។",t_due_now2:"ត្រូវរំលឹក",t_nav_journal:"កំណត់ត្រា",t_nav_vocab:"ពាក្យថ្មី",t_nav_review:"រំលឹក",ph_minutes:"ឧ. 20",ph_wins:"ឧ. Shadow 2 នាទី, រៀន 5 ពាក្យ",ph_notes:"សរសេរកំណត់ត្រានៅទីនេះ...",ph_next:"ឧ. ស្តាប់ 10 នាទី + និយាយ 5 នាទី",ph_word:"ឧ. consistent",ph_meaning:"ឧ. ស្ថិរភាព/ជាប់ចិត្ត",ph_example:"ឧ. I study English consistently.",empty_vocab:"មិនទាន់មានពាក្យទេ។ ចុច + បន្ថែម ដើម្បីបង្កើតកាត។",tag_due:"ត្រូវរំលឹក",tag_due_on:"រំលឹក ",confirm_reset:"កំណត់ឡើងវិញទាំងអស់? (កំណត់ត្រា + ពាក្យ) នេះនឹងលុបទិន្នន័យក្នុងទូរស័ព្ទនេះ។",confirm_delete:"លុប",toast_saved:"រក្សាទុក ✅",toast_done:"បានធ្វើ ✅",toast_unmarked:"ដកសញ្ញា",toast_added:"បានបន្ថែម ✅",toast_updated:"បានកែ ✅",toast_deleted:"បានលុប",toast_exported:"បាននាំចេញ",toast_imported:"បាននាំចូល ✅",toast_import_fail:"នាំចូលបរាជ័យ៖ ",toast_no_due:"មិនមានកាតដល់ពេល ✅",toast_review_done:"រំលឹករួច ✅",toast_word_required:"ត្រូវបញ្ចូលពាក្យ"}};
+let lang=localStorage.getItem("lj_lang")||"en";
+function t(k){const d=I18N[lang]||I18N.en;return d[k]??(I18N.en[k]??k);}
+function applyLang(){const ids=["t_brand","t_brand_sub","t_lang","t_plan","t_due","t_days_title","t_selected","t_done_days","t_streak","t_best","t_words","t_tip_done","t_entry_title","t_date","t_focus","t_minutes","t_mood","t_wins","t_notes","t_next","t_vocab_title","t_vocab_sub","t_add_word","t_word","t_meaning","t_example","t_srs_note","t_srs_boxes","t_box1","t_box2","t_box3","t_box4","t_box5","t_due_now","t_total_words","t_in_box5","t_list_title","t_vocab_tip","t_review_title","t_review_sub","t_due_now2","t_nav_journal","t_nav_vocab","t_nav_review"];for(const id of ids){const el=document.getElementById(id);if(el)el.textContent=t(id);}const btns=["saveBtn","markDoneBtn","unmarkBtn","exportBtn","importBtn","resetBtn","addDaysBtn","openAddVocab","saveVocabBtn","cancelVocabBtn","startReviewBtn","revealBtn","editThisBtn","deleteThisBtn","knewBtn","forgotBtn"];for(const id of btns){const el=document.getElementById(id);if(el)el.textContent=t(id);}minutes.placeholder=t("ph_minutes");wins.placeholder=t("ph_wins");notes.placeholder=t("ph_notes");next.placeholder=t("ph_next");vocabSearch.placeholder=t("vocabSearch");vwWord.placeholder=t("ph_word");vwMeaning.placeholder=t("ph_meaning");vwExample.placeholder=t("ph_example");reviewFooter.textContent=t("reviewFooter");}
+const KEY="learning_app_v3_bilingual";const SRS=[1,2,4,7,14];
+function todayISO(){const d=new Date();const tz=d.getTimezoneOffset()*60000;return new Date(d-tz).toISOString().slice(0,10);}
+function addDaysISO(iso,days){const d=new Date(iso+"T00:00:00");d.setDate(d.getDate()+days);const tz=d.getTimezoneOffset()*60000;return new Date(d-tz).toISOString().slice(0,10);}
+function toast(msg){toastEl.textContent=msg;toastEl.classList.add("show");setTimeout(()=>toastEl.classList.remove("show"),1100);}
+function uid(){return Math.random().toString(16).slice(2)+"-"+Date.now().toString(16);}
+function loadState(){const raw=localStorage.getItem(KEY);if(raw){try{return JSON.parse(raw);}catch(e){}}return{planDays:30,selectedDay:1,entries:{},vocab:[]};}
+let state=loadState();function saveState(){localStorage.setItem(KEY,JSON.stringify(state));}
+function getEntry(day){return state.entries[String(day)]||null;}function setEntry(day,entry){state.entries[String(day)]=entry;}
+function countWords(text){const s=(text||"").trim();return s?s.split(/\s+/).length:0;}
+function totalWords(){let sum=0;for(const k in state.entries){sum+=countWords(state.entries[k].notes||"");}return sum;}
+function doneDaysSorted(){const items=[];for(let d=1;d<=state.planDays;d++){const e=getEntry(d);if(e&&e.done&&e.date)items.push({day:d,date:e.date});}items.sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0);return items;}
+function computeStreaks(){const done=doneDaysSorted();if(done.length===0)return{current:0,best:0};const diff=(a,b)=>Math.round((new Date(b)-new Date(a))/(24*60*60*1000));let best=1,cur=1;for(let i=1;i<done.length;i++){const gap=diff(done[i-1].date,done[i].date);if(gap===1){cur++;best=Math.max(best,cur);}else if(gap>1){cur=1;}}const latest=done[done.length-1].date;const gapToToday=diff(latest,todayISO());let current=0;if(gapToToday===0||gapToToday===1){current=1;for(let i=done.length-1;i>0;i--){const gap=diff(done[i-1].date,done[i].date);if(gap===1)current++;else break;}}return{current,best};}
+function normalizeVocab(){const tdy=todayISO();state.vocab=(state.vocab||[]).map(c=>{const box=Math.min(5,Math.max(1,Number(c.box||1)));let dueAt=c.dueAt;if(!dueAt)dueAt=c.lastReviewedAt?addDaysISO(c.lastReviewedAt,SRS[box-1]):tdy;return{id:c.id||uid(),word:(c.word||"").trim(),meaning:(c.meaning||"").trim(),example:(c.example||"").trim(),box,createdAt:c.createdAt||tdy,lastReviewedAt:c.lastReviewedAt||null,dueAt,stats:c.stats||{correct:0,wrong:0}};}).filter(c=>c.word.length>0);}
+function isDue(c){return (c.dueAt||todayISO())<=todayISO();}
+function dueCards(){return state.vocab.filter(isDue).sort((a,b)=>a.dueAt<b.dueAt?-1:1);}
+function boxCounts(){const counts=[0,0,0,0,0];for(const c of state.vocab){counts[(c.box||1)-1]+=1;}return counts;}
+function scheduleNext(c){const base=todayISO();c.lastReviewedAt=base;c.dueAt=addDaysISO(base,SRS[c.box-1]);}
+function markCorrect(c){c.stats.correct=(c.stats.correct||0)+1;c.box=Math.min(5,(c.box||1)+1);scheduleNext(c);}
+function markWrong(c){c.stats.wrong=(c.stats.wrong||0)+1;c.box=1;scheduleNext(c);}
+function getCardById(id){return state.vocab.find(x=>x.id===id)||null;}
+function renderDays(){planDaysEl.textContent=state.planDays;selDayEl.textContent=(lang==="km"?`ថ្ងៃទី ${state.selectedDay}`:`Day ${state.selectedDay}`);daysGrid.innerHTML="";for(let d=1;d<=state.planDays;d++){const e=getEntry(d);const div=document.createElement("div");div.className="day";if(d===state.selectedDay)div.classList.add("active");if(e&&e.done)div.classList.add("done");const n=document.createElement("div");n.className="n";n.textContent=(lang==="km"?`ថ្ងៃទី ${d}`:`Day ${d}`);div.appendChild(n);const meta=document.createElement("div");meta.className="meta";if(e){const mins=e.minutes?`${e.minutes}m`:"";const f=e.focus&&e.focus!=="All"?e.focus:"";const date=e.date||"";meta.textContent=[date,f,mins].filter(Boolean).join(" • ")||"—";}else meta.textContent="—";div.appendChild(meta);const badge=document.createElement("div");badge.className="badge"+((e&&e.done)?" done":"");badge.textContent=(e&&e.done)?(lang==="km"?"បានធ្វើ":"Done"):(lang==="km"?"មិនទាន់":"Not yet");div.appendChild(badge);div.addEventListener("click",()=>{state.selectedDay=d;saveState();renderAll();});daysGrid.appendChild(div);}}
+function renderEditor(){const e=getEntry(state.selectedDay);date.value=e&&e.date?e.date:todayISO();focus.value=e&&e.focus?e.focus:"All";minutes.value=e&&((e.minutes??"")!==null)?(e.minutes??""):"";mood.value=e&&e.mood?e.mood:"🙂 Good";wins.value=e&&e.wins?e.wins:"";notes.value=e&&e.notes?e.notes:"";next.value=e&&e.next?e.next:"";}
+function renderStats(){let done=0;for(let d=1;d<=state.planDays;d++){const e=getEntry(d);if(e&&e.done)done++;}doneCount.textContent=done;const s=computeStreaks();streak.textContent=s.current;bestStreak.textContent=s.best;words.textContent=totalWords();}
+function renderVocabStats(){const c=boxCounts();box1.textContent=c[0];box2.textContent=c[1];box3.textContent=c[2];box4.textContent=c[3];box5.textContent=c[4];const due=dueCards().length;dueCount.textContent=due;dueCountTop.textContent=due;dueNow.textContent=due;totalVocab.textContent=state.vocab.length;learnedVocab.textContent=c[4];}
+function cardTag(c){const due=isDue(c)?t("tag_due"):(t("tag_due_on")+c.dueAt);return `Box ${c.box} • ${due}`;}
+function renderVocabList(){const q=(vocabSearch.value||"").trim().toLowerCase();const items=state.vocab.slice().sort((a,b)=>{const ad=isDue(a)?0:1,bd=isDue(b)?0:1;if(ad!==bd)return ad-bd;if(a.box!==b.box)return a.box-b.box;return a.word.localeCompare(b.word);}).filter(c=>!q||(c.word+" "+c.meaning+" "+c.example).toLowerCase().includes(q));vocabList.innerHTML="";if(items.length===0){const empty=document.createElement("div");empty.className="sub";empty.textContent=t("empty_vocab");vocabList.appendChild(empty);return;}for(const c of items){const box=document.createElement("div");box.className="item";const top=document.createElement("div");top.className="itemTop";const left=document.createElement("div");const w=document.createElement("div");w.className="word";w.textContent=c.word;left.appendChild(w);const m=document.createElement("div");m.className="meaning";m.textContent=c.meaning||"—";left.appendChild(m);const ex=document.createElement("div");ex.className="example";ex.textContent=c.example?((lang==="km"?"ឧទាហរណ៍: ":"Example: ")+c.example):(lang==="km"?"ឧទាហរណ៍: —":"Example: —");left.appendChild(ex);const tag=document.createElement("div");tag.className="tag";tag.textContent=cardTag(c);top.appendChild(left);top.appendChild(tag);box.appendChild(top);const btns=document.createElement("div");btns.className="itemBtns";const review=document.createElement("button");review.className="btn primary";review.textContent=isDue(c)?(lang==="km"?"រំលឹកឥឡូវ":"Review now"):(lang==="km"?"ហាត់":"Practice");review.onclick=()=>{startSession([c.id]);switchScreen("review");};const edit=document.createElement("button");edit.className="btn";edit.textContent=t("editThisBtn");edit.onclick=()=>openEditVocab(c.id);const del=document.createElement("button");del.className="btn danger";del.textContent=t("deleteThisBtn");del.onclick=()=>deleteVocab(c.id);btns.appendChild(review);btns.appendChild(edit);btns.appendChild(del);box.appendChild(btns);vocabList.appendChild(box);}}
+let session={ids:[],idx:0,revealed:false};
+function startSession(ids=null){const arr=ids?ids.slice():dueCards().map(c=>c.id);session={ids:arr,idx:0,revealed:false};if(arr.length===0){reviewCard.style.display="none";reviewFooter.textContent=t("toast_no_due");progBar.style.width="0%";toast(t("toast_no_due"));return;}reviewCard.style.display="block";reviewFooter.textContent=(lang==="km"?"ចុច “បង្ហាញ” → ហើយជ្រើស ✅ / ❌":"Reveal → then choose ✅ / ❌.");renderReviewCard();}
+function renderReviewCard(){const total=session.ids.length,idx=session.idx,id=session.ids[idx];const c=getCardById(id);if(!c){session.ids.splice(idx,1);if(session.ids.length===0)return startSession([]);session.idx=Math.min(session.idx,session.ids.length-1);return renderReviewCard();}revealArea.classList.remove("show");reviewMeta.textContent=(lang==="km"?`កាត ${idx+1} / ${total}`:`Card ${idx+1} / ${total}`);reviewWord.textContent=c.word;reviewMeaning.textContent=c.meaning||"—";reviewExample.textContent=c.example?((lang==="km"?"ឧទាហរណ៍: ":"Example: ")+c.example):(lang==="km"?"ឧទាហរណ៍: —":"Example: —");boxInfo.textContent=(lang==="km"?`ប្រអប់បច្ចុប្បន្ន: ${c.box} • រំលឹកបន្ទាប់ក្នុង ${SRS[c.box-1]} ថ្ងៃ`:`Current: Box ${c.box} • Next due in ${SRS[c.box-1]} day(s).`);progBar.style.width=Math.round((idx/total)*100)+"%";}
+function nextCard(){session.idx++;if(session.idx>=session.ids.length){progBar.style.width="100%";reviewCard.style.display="none";reviewFooter.textContent=t("toast_review_done");toast(t("toast_review_done"));saveState();renderAll();return;}renderReviewCard();}
+let editingId=null;
+function openAdd(){addVocabCard.style.display="block";vwWord.value="";vwMeaning.value="";vwExample.value="";vwWord.focus();}
+function closeAdd(){addVocabCard.style.display="none";}
+function openEditVocab(id){const c=getCardById(id);if(!c)return;editingId=id;addVocabCard.style.display="block";vwWord.value=c.word;vwMeaning.value=c.meaning;vwExample.value=c.example;vwWord.focus();toast(lang==="km"?"កំពុងកែ…":"Editing…");}
+function saveVocab(){const word=(vwWord.value||"").trim(),meaning=(vwMeaning.value||"").trim(),example=(vwExample.value||"").trim();if(!word){toast(t("toast_word_required"));vwWord.focus();return;}const tdy=todayISO();if(editingId){const c=getCardById(editingId);if(!c)return;c.word=word;c.meaning=meaning;c.example=example;editingId=null;closeAdd();saveState();toast(t("toast_updated"));renderAll();return;}state.vocab.unshift({id:uid(),word,meaning,example,box:1,createdAt:tdy,lastReviewedAt:null,dueAt:tdy,stats:{correct:0,wrong:0}});closeAdd();saveState();toast(t("toast_added"));renderAll();}
+function deleteVocab(id){const c=getCardById(id);if(!c)return;const ok=confirm(`${t("confirm_delete")} "${c.word}"?`);if(!ok)return;state.vocab=state.vocab.filter(x=>x.id!==id);saveState();toast(t("toast_deleted"));renderAll();}
+function switchScreen(which){const map={journal:[screenJournal,navJournal],vocab:[screenVocab,navVocab],review:[screenReview,navReview]};for(const k in map){map[k][0].classList.remove("active");map[k][1].classList.remove("active");}map[which][0].classList.add("active");map[which][1].classList.add("active");if(which==="review")dueNow.textContent=dueCards().length;}
+function exportBackup(){const payload={...state,_meta:{version:"v3_bilingual",exportedAt:new Date().toISOString()},lang};const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="learning-journal-backup.json";document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);toast(t("toast_exported"));}
+async function importBackup(file){const txt=await file.text();const imported=JSON.parse(txt);if(!imported||typeof imported!=="object")throw new Error("Bad file");if(typeof imported.planDays!=="number"||typeof imported.entries!=="object")throw new Error("Invalid format");state={planDays:imported.planDays,selectedDay:imported.selectedDay||1,entries:imported.entries||{},vocab:imported.vocab||[]};if(imported.lang&&(imported.lang==="en"||imported.lang==="km")){lang=imported.lang;localStorage.setItem("lj_lang",lang);langSel.value=lang;}normalizeVocab();saveState();toast(t("toast_imported"));renderAll();}
+function renderAll(){normalizeVocab();renderDays();renderEditor();renderStats();renderVocabStats();renderVocabList();dueNow.textContent=dueCards().length;dueCountTop.textContent=dueCards().length;}
+langSel.value=lang;langSel.addEventListener("change",e=>{lang=e.target.value;localStorage.setItem("lj_lang",lang);applyLang();renderAll();});
+applyLang();normalizeVocab();saveState();renderAll();
+navJournal.onclick=()=>switchScreen("journal");navVocab.onclick=()=>switchScreen("vocab");navReview.onclick=()=>switchScreen("review");
+saveBtn.onclick=()=>{const entry={date:date.value||todayISO(),focus:focus.value,minutes:minutes.value===""?null:Number(minutes.value),mood:mood.value,wins:wins.value.trim(),notes:notes.value.trim(),next:next.value.trim(),done:(getEntry(state.selectedDay)?.done)||false};setEntry(state.selectedDay,entry);saveState();toast(t("toast_saved"));renderAll();};
+markDoneBtn.onclick=()=>{const prev=getEntry(state.selectedDay)||{};const entry={date:date.value||prev.date||todayISO(),focus:focus.value||prev.focus||"All",minutes:minutes.value===""?(prev.minutes??null):Number(minutes.value),mood:mood.value||prev.mood||"🙂 Good",wins:wins.value.trim()||prev.wins||"",notes:notes.value.trim()||prev.notes||"",next:next.value.trim()||prev.next||"",done:true};setEntry(state.selectedDay,entry);saveState();toast(t("toast_done"));renderAll();};
+unmarkBtn.onclick=()=>{const e=getEntry(state.selectedDay);if(!e)return toast(lang==="km"?"មិនមានអ្វីទេ":"Nothing to unmark");e.done=false;setEntry(state.selectedDay,e);saveState();toast(t("toast_unmarked"));renderAll();};
+addDaysBtn.onclick=()=>{state.planDays+=7;saveState();toast(lang==="km"?"+7 ថ្ងៃ":"+7 days");renderAll();};
+resetBtn.onclick=()=>{if(!confirm(t("confirm_reset")))return;localStorage.removeItem(KEY);state=loadState();normalizeVocab();saveState();toast(lang==="km"?"បានកំណត់ឡើងវិញ":"Reset done");renderAll();};
+exportBtn.onclick=exportBackup;importBtn.onclick=()=>{fileInput.value="";fileInput.click();};fileInput.addEventListener("change",async()=>{const file=fileInput.files?.[0];if(!file)return;try{await importBackup(file);}catch(e){alert(t("toast_import_fail")+e.message);}});
+openAddVocab.onclick=()=>{editingId=null;openAdd();};cancelVocabBtn.onclick=()=>{editingId=null;closeAdd();};saveVocabBtn.onclick=saveVocab;vocabSearch.addEventListener("input",()=>renderVocabList());
+startReviewBtn.onclick=()=>startSession();revealBtn.onclick=()=>revealArea.classList.add("show");
+knewBtn.onclick=()=>{const c=getCardById(session.ids[session.idx]);if(!c)return nextCard();markCorrect(c);saveState();toast(lang==="km"?`✅ ឡើងប្រអប់ ${c.box}`:`✅ Up to Box ${c.box}`);renderVocabStats();nextCard();};
+forgotBtn.onclick=()=>{const c=getCardById(session.ids[session.idx]);if(!c)return nextCard();markWrong(c);saveState();toast(lang==="km"?"❌ ត្រឡប់ទៅប្រអប់ 1":"❌ Back to Box 1");renderVocabStats();nextCard();};
+editThisBtn.onclick=()=>{const c=getCardById(session.ids[session.idx]);if(!c)return;switchScreen("vocab");openEditVocab(c.id);};
+deleteThisBtn.onclick=()=>{const c=getCardById(session.ids[session.idx]);if(!c)return;if(!confirm(`${t("confirm_delete")} "${c.word}"?`))return;deleteVocab(c.id);session.ids=session.ids.filter(x=>x!==c.id);session.idx=Math.min(session.idx,session.ids.length-1);session.ids.length===0?startSession([]):renderReviewCard();};
+if("serviceWorker"in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));}
 </script>
-</body>
-</html>
+</body></html>
